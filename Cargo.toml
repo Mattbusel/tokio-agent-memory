@@ -1,0 +1,27 @@
+[package]
+name = "tokio-agent-memory"
+version = "0.1.0"
+edition = "2021"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+
+[dependencies]
+tokio = { version = "1.40", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+blake3 = "1.5"
+dashmap = "5.5"
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+parking_lot = "0.12"
+fuzzy-matcher = "0.3"
+
+[dev-dependencies]
+proptest = "1.4"
+tokio-test = "0.4"
+tempfile = "3.9"
