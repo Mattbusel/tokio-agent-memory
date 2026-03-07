@@ -64,3 +64,7 @@ tokio-agent-memory = { git = "https://github.com/Mattbusel/tokio-agent-memory" }
 ```bash
 cargo test
 ```
+
+---
+
+> Used inside [tokio-prompt-orchestrator](https://github.com/Mattbusel/tokio-prompt-orchestrator) -- a production Rust orchestration layer for LLM pipelines. See the full [primitive library collection](https://github.com/Mattbusel/rust-crates).
