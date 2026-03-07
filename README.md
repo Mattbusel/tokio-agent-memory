@@ -57,6 +57,12 @@ println!("Recalled {} events", recent.len());
 tokio-agent-memory = { git = "https://github.com/Mattbusel/tokio-agent-memory" }
 ```
 
+Or one-liner:
+
+```ash
+cargo add --git https://github.com/Mattbusel/tokio-agent-memory
+```
+
 ## Test coverage
 
 120+ tests across unit, integration, and multi-module pipeline suites.
