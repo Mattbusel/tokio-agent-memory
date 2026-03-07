@@ -41,7 +41,7 @@ pub fn retrieve_from_items(
             filtered
                 .iter()
                 .filter_map(|i| {
-                    let target = format!("{} {}", i.tags.join(" "), i.content.to_string());
+                    let target = format!("{} {}", i.tags.join(" "), i.content);
                     matcher.fuzzy_match(&target, text).and_then(|score| {
                         let normalized = (score as f32 / 100.0).clamp(0.0, 1.0);
                         if normalized >= *threshold {
