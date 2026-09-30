@@ -1,6 +1,6 @@
 # tokio-agent-memory
 
-[![CI](https://github.com/Mattbusel/tokio-agent-memory/actions/workflows/ci.yml/badge.svg)](https://github.com/Mattbusel/tokio-agent-memory/actions/workflows/ci.yml)
+
 [![crates.io](https://img.shields.io/crates/v/tokio-agent-memory.svg)](https://crates.io/crates/tokio-agent-memory)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -106,7 +106,7 @@ tests/memory_integration.rs   cross-module scenarios
 
 ## Status and limitations
 
-Version 0.1. Everything lives in process memory; `FileStore` is the only on-disk option. Retrieval is lexical (tags and fuzzy string matching), there are no embeddings. The `MemoryStore` trait is synchronous. For a similar crate with a trait-based episodic/semantic store design, Ebbinghaus decay and binary snapshots, see [tokio-memory](https://github.com/Mattbusel/tokio-memory).
+Version 0.1. Everything lives in process memory; `FileStore` is the only on-disk option. Retrieval is lexical (tags and fuzzy string matching), there are no embeddings. The `MemoryStore` trait is synchronous. For a similar crate with a trait-based episodic/semantic store design, Ebbinghaus decay and binary snapshots, see [tokio-memory](https://gitlab.com/mattbusel/tokio-memory).
 
 ```bash
 cargo test
@@ -118,4 +118,4 @@ MIT, see [LICENSE](LICENSE).
 
 ---
 
-Part of a set of Rust crates for LLM agents, see [rust-crates](https://github.com/Mattbusel/rust-crates).
+Part of a set of Rust crates for LLM agents, see [rust-crates](https://gitlab.com/mattbusel/rust-crates).
