@@ -23,5 +23,8 @@ test:
     key: cargo-test
     paths: [target/, .cargo-home/]
   script:
-    - cargo test --locked --all-features
+    # The fastembed feature links ONNX Runtime, too big for the shared runner;
+    # it is tested on GitHub Actions and with the opt-in real-model test.
+    - cargo test --locked --features openai
+    - cargo check --locked --all-features --all-targets
 
