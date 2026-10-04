@@ -20,6 +20,7 @@ An agent that runs for hours needs more than its context window. This crate give
 | `consolidation` | `Consolidator`: moves working-memory items into semantic memory (importance at or above a threshold) or episodic memory (the rest) |
 | `persistence` | `MemoryStore` trait with `InMemoryStore` and `FileStore` (a JSON file, written on `flush`) |
 | `shared` | `SharedMemoryBus`: Tokio broadcast channel of `MemoryItem`s plus time-limited write leases per key |
+| `semantic_search` | `SemanticIndex`: find memories by meaning with embeddings, from a local model (`fastembed` feature) or any OpenAI-compatible API (`openai` feature) |
 
 All types are `Send + Sync` (backed by `DashMap` and `parking_lot`), and the crate denies `unwrap`, `expect` and `panic` through Clippy lints.
 
@@ -88,9 +89,46 @@ async fn main() -> Result<(), MemoryError> {
 }
 ```
 
+## Search by meaning
+
+Tag and fuzzy retrieval only find memories that share words with the question. `SemanticIndex` embeds each memory once and ranks memories by cosine similarity to the question, so "any dietary restrictions I should know about?" finds "User is vegetarian and allergic to peanuts".
+
+```toml
+tokio-agent-memory = { version = "0.2", features = ["fastembed"] }  # local model, no API key
+# or features = ["openai"]  for OpenAI, Ollama, vLLM, LM Studio, text-embeddings-inference
+```
+
+```rust,no_run
+use tokio_agent_memory::semantic_search::{FastEmbedder, SemanticIndex};
+use tokio_agent_memory::types::{AgentId, MemoryItem};
+
+#[tokio::main]
+async fn main() -> Result<(), tokio_agent_memory::MemoryError> {
+    let memories: Vec<MemoryItem> = [
+        "User is vegetarian and allergic to peanuts",
+        "Booked a window seat on TAP flight 1234 to Lisbon",
+        "The quarterly report is due on Friday",
+    ]
+    .iter()
+    .map(|t| MemoryItem::new(serde_json::json!(t), vec![], AgentId::new("assistant"), 0.5))
+    .collect();
+
+    // BGE-small-en-v1.5, downloaded once (about 130 MB) to your cache directory.
+    let index = SemanticIndex::new(FastEmbedder::try_default()?);
+    for hit in index.search(&memories, "when does the plane leave for Portugal?", 1, 0.0).await? {
+        println!("{:.2} {}", hit.score, hit.item.content); // 0.69 "Booked a window seat ... Lisbon"
+    }
+    Ok(())
+}
+```
+
+With the `openai` feature, use `OpenAiEmbedder::new("text-embedding-3-small").with_api_key(key)`, or `.with_base_url("http://localhost:11434/v1")` for Ollama. Any other model works through the one-method `Embedder` trait. Each memory is embedded once (in a batch) and cached; only the current items you pass are searched, so forgotten memories do not come back. The `fastembed` feature needs Rust 1.88.
+
+Small local models match paraphrases well (the scores above are from the crate's test against the real model); questions that need a reasoning step ("what can I cook tonight?" for a dietary memory) need a larger embedding model.
+
 ## Layout
 
-```
+```text
 src/
   types.rs          MemoryId, AgentId, MemoryItem (JSON content, tags, confidence, importance)
   episodic/         EpisodicMemory, Event, CausalChain
@@ -101,15 +139,18 @@ src/
   consolidation/    Consolidator, ConsolidationPolicy
   persistence/      MemoryStore, InMemoryStore, FileStore
   shared/           SharedMemoryBus, WriteLease
-tests/memory_integration.rs   cross-module scenarios
+  semantic_search.rs  Embedder, SemanticIndex, FastEmbedder, OpenAiEmbedder
+tests/memory_integration.rs     cross-module scenarios
+tests/semantic_search_model.rs  meaning-based recall against the real model (opt-in)
 ```
 
 ## Status and limitations
 
-Version 0.1. Everything lives in process memory; `FileStore` is the only on-disk option. Retrieval is lexical (tags and fuzzy string matching), there are no embeddings. The `MemoryStore` trait is synchronous. For a similar crate with a trait-based episodic/semantic store design, Ebbinghaus decay and binary snapshots, see [tokio-memory](https://gitlab.com/mattbusel/tokio-memory).
+Version 0.2. Everything lives in process memory; `FileStore` is the only on-disk option (the semantic index is in memory too). Retrieval is lexical (tags, fuzzy matching) or by meaning (`SemanticIndex`). The `MemoryStore` trait is synchronous. For a similar crate with a trait-based episodic/semantic store design, Ebbinghaus decay and binary snapshots, see [tokio-memory](https://gitlab.com/mattbusel/tokio-memory).
 
 ```bash
-cargo test
+cargo test --all-features
+cargo test --features fastembed --test semantic_search_model -- --ignored   # real model
 ```
 
 ## License

@@ -1,13 +1,28 @@
 [package]
 name = "tokio-agent-memory"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+rust-version = "1.85"
+description = "Tokio-native agent memory: episodic, semantic, and working memory with decay scheduling, persistence, a multi-agent bus, and search by meaning (local or API embeddings)"
+readme = "README.md"
+keywords = ["tokio", "memory", "agents", "embeddings", "llm"]
+categories = ["asynchronous", "memory-management", "text-processing"]
+license = "MIT"
+repository = "https://gitlab.com/mattbusel/tokio-agent-memory"
+homepage = "https://gitlab.com/mattbusel/tokio-agent-memory"
+documentation = "https://docs.rs/tokio-agent-memory"
 
 [lints.clippy]
 unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"
 todo = "deny"
+
+[features]
+# Local embedding model for SemanticIndex (ONNX Runtime; needs Rust 1.88).
+fastembed = ["dep:fastembed"]
+# OpenAI-compatible /embeddings endpoint for SemanticIndex.
+openai = ["dep:reqwest"]
 
 [dependencies]
 tokio = { version = "1.40", features = ["full"] }
@@ -20,8 +35,18 @@ thiserror = "1.0"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 parking_lot = "0.12"
 fuzzy-matcher = "0.3"
+async-trait = "0.1.92"
+fastembed = { version = "7.1", default-features = false, features = ["ort-download-binaries-rustls-tls", "hf-hub-rustls-tls"], optional = true }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"], optional = true }
 
 [dev-dependencies]
 proptest = "1.4"
 tokio-test = "0.4"
 tempfile = "3.9"
+
+[[test]]
+name = "semantic_search_model"
+required-features = ["fastembed"]
+
+[package.metadata.docs.rs]
+all-features = true

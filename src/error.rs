@@ -1,4 +1,5 @@
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum MemoryError {
     #[error("Memory item '{0}' not found")]
     NotFound(String),
@@ -20,6 +21,8 @@ pub enum MemoryError {
     InvalidDecayRate(f64),
     #[error("Send error: channel closed")]
     ChannelClosed,
+    #[error("Embedding failed: {0}")]
+    Embedding(String),
     #[error("Working memory capacity must be > 0")]
     ZeroCapacity,
 }
