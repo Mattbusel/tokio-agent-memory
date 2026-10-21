@@ -1,5 +1,13 @@
 # tokio-agent-memory
 
+<!-- outcome-block -->
+**Agents that remember across hours, not just one context window: episodic, semantic and working memory in-process, with no database or server.**
+
+**Why this over the alternatives:** Vector stores only do similarity search. This adds cause-and-effect links, a fact graph, priority-based working memory and decay, as plain Rust data structures.
+
+**Guarantee:** if it doesn't do what this README says, [open an issue](https://github.com/Mattbusel/tokio-agent-memory/issues) and I'll fix it.
+<!-- outcome-block -->
+
 
 [![crates.io](https://img.shields.io/crates/v/tokio-agent-memory.svg)](https://crates.io/crates/tokio-agent-memory)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
